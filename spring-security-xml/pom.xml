@@ -9,7 +9,7 @@
     </parent>
     <modelVersion>4.0.0</modelVersion>
     <packaging>war</packaging>
-    <description>Spring Security XML</description>
+    <description>Spring Security 单体应用 XML 配置方式</description>
 
     <artifactId>spring-security-xml</artifactId>
 
