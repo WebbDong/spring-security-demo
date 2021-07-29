@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xmlns:context="http://www.springframework.org/schema/context"
+        xmlns:aop="http://www.springframework.org/schema/aop"
+        xmlns:tx="http://www.springframework.org/schema/tx"
+        xmlns:mvc="http://www.springframework.org/schema/mvc"
+        xmlns:security="http://www.springframework.org/schema/security"
+        xsi:schemaLocation="http://www.springframework.org/schema/beans
+			    http://www.springframework.org/schema/beans/spring-beans.xsd
+			    http://www.springframework.org/schema/context
+			    http://www.springframework.org/schema/context/spring-context.xsd
+			    http://www.springframework.org/schema/aop
+			    http://www.springframework.org/schema/aop/spring-aop.xsd
+			    http://www.springframework.org/schema/tx
+			    http://www.springframework.org/schema/tx/spring-tx.xsd
+			    http://www.springframework.org/schema/mvc
+			    http://www.springframework.org/schema/mvc/spring-mvc.xsd
+                http://www.springframework.org/schema/security
+			    http://www.springframework.org/schema/security/spring-security.xsd">
+
+    <!-- 释放静态资源 -->
+    <security:http pattern="/css/**" security="none"/>
+    <security:http pattern="/img/**" security="none"/>
+    <security:http pattern="/plugins/**" security="none"/>
+    <security:http pattern="/failer.jsp" security="none"/>
+    <security:http pattern="/favicon.ico" security="none"/>
+
+    <!-- 配置 Spring Security -->
+    <!--
+    auto-config="true"       表示自动加载 Spring Security 的配置文件
+    use-expressions="true"   表示使用 Spring 的 el 表达式来配置 Spring Security
+    -->
+    <security:http auto-config="true" use-expressions="true">
+        <!-- 让登录页面可以匿名访问 -->
+        <security:intercept-url pattern="/login.jsp" access="permitAll()"/>
+
+        <!-- 拦截资源 -->
+        <!--
+        pattern="/**"                       表示拦截所有资源
+        access="hasAnyRole('ROLE_USER')"    表示只有 ROLE_USER 角色才能访问资源
+        -->
+        <security:intercept-url pattern="/**" access="hasAnyRole('ROLE_USER', 'ROLE_ADMIN')"/>
+
+<!--        <security:intercept-url pattern="/**" access="permitAll()"/>-->
+
+        <!-- 配置认证信息 -->
+        <security:form-login login-page="/login.jsp"
+                             login-processing-url="/login"
+                             default-target-url="/index.jsp"
+                             authentication-failure-url="/failer.jsp"
+                             username-parameter="username"
+                             password-parameter="password"/>
+
+        <!-- 配置退出登录信息 -->
+        <security:logout logout-url="/logout"
+                         logout-success-url="/login.jsp"/>
+
+        <!-- 去掉 csrf 拦截的过滤器 -->
+<!--        <security:csrf disabled="true"/>-->
+
+        <!-- 开启 Remember Me 过滤器，设置 Token 存储时间为 40 秒，基于 Cookie 方式 -->
+<!--        <security:remember-me token-validity-seconds="40"/>-->
+
+        <!-- 开启 Remember Me 过滤器，设置 Token 存储时间为 40 秒，基于数据库持久化 Token 方式 -->
+        <security:remember-me token-validity-seconds="40"
+                              data-source-ref="dataSource"
+                              remember-me-parameter="remember-me"/>
+
+        <!-- 配置 403 异常响应页面，方式一 -->
+<!--        <security:access-denied-handler error-page="/403.jsp"/>-->
+    </security:http>
+
+    <!-- 设置 Spring Security 认证用户信息的来源 - 手动配置用户数据信息形式，只用于测试 -->
+    <!-- Spring Security 默认的认证必须是加密的，加上 {noop} 表示不加密认证。-->
+    <!--
+    <security:authentication-manager>
+        <security:authentication-provider>
+            <security:user-service>
+                <security:user name="user" password="{noop}user" authorities="ROLE_USER" />
+                <security:user name="admin" password="{noop}admin" authorities="ROLE_ADMIN" />
+            </security:user-service>
+        </security:authentication-provider>
+    </security:authentication-manager>
+    -->
+
+    <!-- 使用数据库 -->
+    <!--
+    <security:authentication-manager>
+        <security:authentication-provider user-service-ref="userServiceImpl">
+        </security:authentication-provider>
+    </security:authentication-manager>
+    -->
+
+    <!-- 使用数据库并且加密密码 -->
+    <!-- 把加密对象放入的 IOC 容器中 -->
+    <bean id="passwordEncoder" class="org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder"/>
+
+    <security:authentication-manager>
+        <security:authentication-provider user-service-ref="userServiceImpl">
+            <security:password-encoder ref="passwordEncoder"/>
+        </security:authentication-provider>
+    </security:authentication-manager>
+
+    <!--
+    开启父容器权限控制注解支持
+    jsr250-annotations="enabled"     表示开启 jsr250-api 的注解，需要 jsr250-api 的 jar 包
+    pre-post-annotations="enabled"   表示开启 Spring 表达式注解
+    secured-annotations="enabled"    表示开启 Spring Security 提供的注解
+
+    Spring 父容器对应的是 applicationContext.xml 配置文件，由 ContextLoaderListener 加载，
+    Spring MVC 子容器对应的是 spring-mvc.xml 配置文件，由 DispatcherServlet 加载，
+    父容器中的对象可以被子容器访问，如果权限注解想加在 Service 层，就需要定义在父容器中，
+    如果权限注解想加在 Controller 层，就需要定义在 MVC 子容器中
+    -->
+    <security:global-method-security jsr250-annotations="enabled"
+                                     pre-post-annotations="enabled"
+                                     secured-annotations="enabled"/>
+
+</beans>

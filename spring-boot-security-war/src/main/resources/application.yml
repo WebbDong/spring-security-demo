@@ -1,0 +1,19 @@
+server:
+  port: 9001
+spring:
+  mvc:
+    view:
+      prefix: /pages/
+      suffix: .jsp
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://localhost:33006/spring-security?rewriteBatchedStatements=true&max_allowed_packet=10M&allowPublicKeyRetrieval=true
+    username: root
+    password: 123456
+mybatis:
+  type-aliases-package: com.webbdong.boot.security.domain
+  configuration:
+    map-underscore-to-camel-case: true
+logging:
+  level:
+    com.webbdong.boot.security: debug
