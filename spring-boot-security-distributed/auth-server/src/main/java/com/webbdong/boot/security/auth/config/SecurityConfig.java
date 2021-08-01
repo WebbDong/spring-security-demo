@@ -1,7 +1,7 @@
 package com.webbdong.boot.security.auth.config;
 
 import com.webbdong.boot.security.auth.filter.JwtAuthFilter;
-import com.webbdong.boot.security.auth.filter.JwtVerifyFilter;
+import com.webbdong.boot.security.auth.util.RsaKeyHolder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -40,9 +40,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers("/product/**").hasAnyRole("USER", "PRODUCT")
                 .and()
                 // 增加自定义认证过滤器
-                .addFilter(new JwtAuthFilter(authenticationManager()))
-                // 增加自定义验证认证过滤器
-                .addFilter(new JwtVerifyFilter(authenticationManager()))
+                .addFilter(new JwtAuthFilter(authenticationManager(), RsaKeyHolder.INSTANCE.getJwtPrivateKey()))
                 // 前后端分离是无状态的，不用 session 了，直接禁用。
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
     }

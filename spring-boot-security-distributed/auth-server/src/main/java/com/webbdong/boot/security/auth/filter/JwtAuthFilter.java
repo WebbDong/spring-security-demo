@@ -1,11 +1,11 @@
 package com.webbdong.boot.security.auth.filter;
 
-import com.webbdong.boot.security.auth.domain.SysRole;
 import com.webbdong.boot.security.auth.domain.SysUser;
-import com.webbdong.boot.security.auth.util.RsaKeyHolder;
 import com.webbdong.boot.security.common.consts.JwtConsts;
 import com.webbdong.boot.security.common.enums.ExpirationTimeUnit;
-import com.webbdong.boot.security.common.model.Response;
+import com.webbdong.boot.security.common.model.dto.SysRoleDTO;
+import com.webbdong.boot.security.common.model.dto.SysUserDTO;
+import com.webbdong.boot.security.common.model.vo.ResponseVO;
 import com.webbdong.boot.security.common.util.JsonUtils;
 import com.webbdong.boot.security.common.util.JwtUtils;
 import lombok.AllArgsConstructor;
@@ -24,6 +24,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.nio.charset.Charset;
+import java.security.PrivateKey;
 import java.util.List;
 
 /**
@@ -36,6 +37,8 @@ import java.util.List;
 public class JwtAuthFilter extends UsernamePasswordAuthenticationFilter {
 
     private AuthenticationManager authenticationManager;
+
+    private PrivateKey privateKey;
 
     /**
      * 接收解析用户凭证，并认证
@@ -63,14 +66,14 @@ public class JwtAuthFilter extends UsernamePasswordAuthenticationFilter {
                                             HttpServletResponse response,
                                             FilterChain chain,
                                             Authentication authResult) throws IOException, ServletException {
-        final SysUser sysUser = SysUser.builder()
+        final SysUserDTO sysUser = SysUserDTO.builder()
                 .username(authResult.getName())
-                .roles((List<SysRole>) authResult.getAuthorities())
+                .roles((List<SysRoleDTO>) authResult.getAuthorities())
                 .build();
         final String jwt = JwtUtils.generateJwt(
                 JwtConsts.USER_INFO_PROPERTY_NAME,
                 JsonUtils.toJson(sysUser),
-                RsaKeyHolder.INSTANCE.getJwtPrivateKey(),
+                privateKey,
                 1,
                 ExpirationTimeUnit.MINUTES);
         successResponse(response, jwt);
@@ -80,9 +83,9 @@ public class JwtAuthFilter extends UsernamePasswordAuthenticationFilter {
     private void successResponse(HttpServletResponse response, Object data) {
         response.setContentType("application/json;charset=utf8");
         response.setStatus(HttpServletResponse.SC_OK);
-        response.getWriter().write(JsonUtils.toJson(Response.builder()
+        response.getWriter().write(JsonUtils.toJson(ResponseVO.builder()
                 .code(HttpServletResponse.SC_OK)
-                .msg("账号或密码错误！")
+                .msg("授权成功")
                 .data(data)
                 .build()));
         response.getWriter().flush();
@@ -93,7 +96,7 @@ public class JwtAuthFilter extends UsernamePasswordAuthenticationFilter {
     private void errorResponse(HttpServletResponse response, int statusCode) {
         response.setContentType("application/json;charset=utf8");
         response.setStatus(statusCode);
-        response.getWriter().write(JsonUtils.toJson(Response.builder()
+        response.getWriter().write(JsonUtils.toJson(ResponseVO.builder()
                 .code(statusCode)
                 .msg("账号或密码错误！")
                 .build()));

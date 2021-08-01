@@ -1,4 +1,4 @@
-package com.webbdong.boot.security.common.model;
+package com.webbdong.boot.security.common.model.vo;
 
 import lombok.Builder;
 import lombok.Data;
@@ -9,7 +9,7 @@ import lombok.Data;
  */
 @Data
 @Builder
-public class Response<T> {
+public class ResponseVO<T> {
 
     private int code;
 

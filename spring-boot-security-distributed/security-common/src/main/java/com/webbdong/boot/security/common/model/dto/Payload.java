@@ -1,4 +1,4 @@
-package com.webbdong.boot.security.common.model;
+package com.webbdong.boot.security.common.model.dto;
 
 import lombok.Data;
 import lombok.experimental.SuperBuilder;

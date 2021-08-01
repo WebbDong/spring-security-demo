@@ -1,7 +1,7 @@
 package com.webbdong.boot.security.common.util;
 
 import com.webbdong.boot.security.common.enums.ExpirationTimeUnit;
-import com.webbdong.boot.security.common.model.Payload;
+import com.webbdong.boot.security.common.model.dto.Payload;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jws;
 import io.jsonwebtoken.Jwts;

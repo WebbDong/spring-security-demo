@@ -1,10 +1,9 @@
-package com.webbdong.boot.security.auth.filter;
+package com.webbdong.boot.security.common.filter;
 
-import com.webbdong.boot.security.auth.domain.SysUser;
-import com.webbdong.boot.security.auth.util.RsaKeyHolder;
 import com.webbdong.boot.security.common.consts.JwtConsts;
-import com.webbdong.boot.security.common.model.Payload;
-import com.webbdong.boot.security.common.model.Response;
+import com.webbdong.boot.security.common.model.dto.Payload;
+import com.webbdong.boot.security.common.model.dto.SysUserDTO;
+import com.webbdong.boot.security.common.model.vo.ResponseVO;
 import com.webbdong.boot.security.common.util.JsonUtils;
 import com.webbdong.boot.security.common.util.JwtUtils;
 import io.jsonwebtoken.ExpiredJwtException;
@@ -13,7 +12,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
 
 import javax.servlet.FilterChain;
@@ -21,6 +19,7 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.security.PublicKey;
 
 /**
  * JWT 校验过滤器
@@ -29,12 +28,11 @@ import java.io.IOException;
  */
 public class JwtVerifyFilter extends BasicAuthenticationFilter {
 
-    public JwtVerifyFilter(AuthenticationManager authenticationManager) {
-        super(authenticationManager);
-    }
+    private PublicKey publicKey;
 
-    public JwtVerifyFilter(AuthenticationManager authenticationManager, AuthenticationEntryPoint authenticationEntryPoint) {
-        super(authenticationManager, authenticationEntryPoint);
+    public JwtVerifyFilter(AuthenticationManager authenticationManager, PublicKey publicKey) {
+        super(authenticationManager);
+        this.publicKey = publicKey;
     }
 
     @Override
@@ -68,12 +66,12 @@ public class JwtVerifyFilter extends BasicAuthenticationFilter {
      * @return
      */
     private UsernamePasswordAuthenticationToken getAuthenticationByToken(String token) {
-        final Payload<SysUser> payload = JwtUtils.parseToken(
+        final Payload<SysUserDTO> payload = JwtUtils.parseToken(
                 JwtConsts.USER_INFO_PROPERTY_NAME,
                 token,
-                RsaKeyHolder.INSTANCE.getJwtPublicKey(),
-                SysUser.class);
-        final SysUser sysUser = payload.getData();
+                publicKey,
+                SysUserDTO.class);
+        final SysUserDTO sysUser = payload.getData();
         if (sysUser != null) {
             return new UsernamePasswordAuthenticationToken(sysUser, null, sysUser.getRoles());
         }
@@ -85,7 +83,7 @@ public class JwtVerifyFilter extends BasicAuthenticationFilter {
         response.setContentType("application/json;charset=utf-8");
         response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
         response.getWriter().write(JsonUtils.toJson(
-                Response.builder()
+                ResponseVO.builder()
                         .code(HttpServletResponse.SC_UNAUTHORIZED)
                         .msg(msg)
                         .build()));
