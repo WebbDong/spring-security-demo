@@ -1,5 +1,5 @@
 server:
-  port: 9002
+  port: 9003
 spring:
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
@@ -7,9 +7,9 @@ spring:
     username: root
     password: 123456
 mybatis:
-  type-aliases-package: com.webbdong.boot.security.product.domain
+  type-aliases-package: com.webbdong.boot.security.auth.domain
   configuration:
     map-underscore-to-camel-case: true
 logging:
   level:
-    com.webbdong.boot.security.product: debug
+    com.webbdong.boot.security.auth: debug

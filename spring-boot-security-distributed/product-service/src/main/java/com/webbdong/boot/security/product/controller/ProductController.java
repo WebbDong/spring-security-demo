@@ -1,4 +1,4 @@
-package com.webbdong.boot.security.auth.controller;
+package com.webbdong.boot.security.product.controller;
 
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
