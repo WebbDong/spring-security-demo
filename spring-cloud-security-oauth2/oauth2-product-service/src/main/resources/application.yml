@@ -1,0 +1,15 @@
+server:
+  port: 9003
+spring:
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://localhost:3306/spring-security-oauth2?rewriteBatchedStatements=true&max_allowed_packet=10M&allowPublicKeyRetrieval=true
+    username: root
+    password: 123456
+mybatis:
+  type-aliases-package: com.webbdong.oauth2.product.domain
+  configuration:
+    map-underscore-to-camel-case: true
+logging:
+  level:
+    com.webbdong.oauth2.product: debug

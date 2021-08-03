@@ -10,5 +10,31 @@
     <modelVersion>4.0.0</modelVersion>
 
     <artifactId>spring-cloud-security-oauth2</artifactId>
+    <packaging>pom</packaging>
+
+    <modules>
+        <module>oauth2-product-service</module>
+        <module>oauth2-server</module>
+        <module>oauth2-common</module>
+    </modules>
+
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-dependencies</artifactId>
+                <version>${spring-boot.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.springframework.cloud</groupId>
+                <artifactId>spring-cloud-dependencies</artifactId>
+                <version>${spring-cloud.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
 
 </project>

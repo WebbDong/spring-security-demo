@@ -1,0 +1,18 @@
+server:
+  port: 9004
+spring:
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://localhost:3306/spring-security-oauth2?rewriteBatchedStatements=true&max_allowed_packet=10M&allowPublicKeyRetrieval=true
+    username: root
+    password: 123456
+  main:
+    # 这个表示允许我们覆盖 OAuth2 放在容器中的 bean 对象
+    allow-bean-definition-overriding: true
+mybatis:
+  type-aliases-package: com.webbdong.oauth2.server.domain
+  configuration:
+    map-underscore-to-camel-case: true
+logging:
+  level:
+    com.webbdong.oauth2.server: DEBUG
