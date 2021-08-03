@@ -13,6 +13,7 @@
         <module>spring-security-xml</module>
         <module>spring-boot-security-war</module>
         <module>spring-boot-security-distributed</module>
+        <module>spring-cloud-security-oauth2</module>
     </modules>
 
     <properties>
